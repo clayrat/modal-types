@@ -53,6 +53,10 @@ exts : Subst d g s -> Subst d (b::g) (b::s)
 exts _  Here      = Var Here
 exts s (There el) = rename There (s el)
 
+extsM : Subst d g s -> Subst (b::d) (b::g) s
+extsM _  Here      = MVar Here
+extsM s (There el) = renameM There (s el)
+
 subst : Subst d g s -> Term d g a -> Term d s a
 subst s (Var el)   = s el
 subst s (MVar el)  = MVar el
@@ -63,3 +67,28 @@ subst s (Fst t)    = Fst $ subst s t
 subst s (Snd t)    = Snd $ subst s t
 subst s (Shut t)   = Shut t
 subst s (Open t u) = Open (subst s t) (subst (renameM There . s) u)
+
+substM : Subst s d [] -> Term d g a -> Term s g a
+substM s (Var el)   = Var el
+substM s (MVar el)  = rename absurd $ s el
+substM s (Lam t)    = Lam $ substM s t
+substM s (App t u)  = App (substM s t) (substM s u)
+substM s (Prod t u) = Prod (substM s t) (substM s u)
+substM s (Fst t)    = Fst $ substM s t
+substM s (Snd t)    = Snd $ substM s t
+substM s (Shut t)   = Shut $ substM s t
+substM s (Open t u) = Open (substM s t) (substM (extsM s) u)
+
+subst1 : Term d (b::g) a -> Term d g b -> Term d g a
+subst1 {d} {g} {b} t s = subst {g=b::g} go t
+  where
+  go : Subst d (b::g) g
+  go  Here      = s
+  go (There el) = Var el
+
+subst1M : Term (b::d) g a -> Term d [] b -> Term d g a
+subst1M {d} {g} {b} t s = substM {d=b::d} go t
+  where
+  go : Subst d (b::d) []
+  go  Here      = s
+  go (There el) = MVar el
