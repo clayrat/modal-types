@@ -2,8 +2,10 @@ package modal-types
 
 sourcedir = src
 
-modules = Data.NEList
+modules = Subset
+        , Dual.KavvosS4
+        , Data.NEList
         , Fitch.IsoFitchKripke
-        , Fitch.Fitch.PfenningK
+        , Fitch.PfenningK
 
 pkgs = contrib, tparsec
