@@ -6,6 +6,7 @@ modules = Subset
         , Dual.S4
         , Data.NEList
         , Fitch.IsoFitchKripke
+        , Fitch.K
         , Fitch.S4
 
 pkgs = contrib, tparsec

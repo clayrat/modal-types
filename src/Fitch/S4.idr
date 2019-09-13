@@ -17,25 +17,26 @@ data Term : NEList (List Ty) -> Ty -> Type where
   Lam  : Term ((a::g) +: ph) b -> Term (g +: ph) (a~>b)
   App  : Term gs (a~>b) -> Term gs a -> Term gs b
   Shut : Term ([] +: (g::ph)) a -> Term (g +: ph) (Box a)
-  Open : Term (g +: ph) (Box a) -> ElemPref g ph ps -> Term ps a
+  Open : ElemPref g ph ps -> Term (g +: ph) (Box a) -> Term ps a
 
 axiomT : Term (g+:ph) (Box a ~> a)
-axiomT = Lam $ Open (Var Here) HereP
+axiomT = Lam $ Open HereP (Var Here)
 
 axiomK : Term (g+:ph) (Box (a ~> b) ~> Box a ~> Box b)
-axiomK = Lam $ Lam $ Shut $ App (Open (Var $ There Here) (ThereP HereP))
-                                (Open (Var Here) (ThereP HereP))
+axiomK = Lam $ Lam $ Shut $ App (Open (ThereP HereP) (Var $ There Here))
+                                (Open (ThereP HereP) (Var Here))
 
 axiom4 : Term (g+:ph) (Box a ~> Box (Box a))
-axiom4 = Lam $ Shut $ Shut $ Open (Var Here) (ThereP $ ThereP HereP)
+axiom4 = Lam $ Shut $ Shut $ Open (ThereP $ ThereP HereP) (Var Here)
 
 -- smallstep
 
--- rename : SubsetN g d -> Term g a -> Term d a
--- rename {d=d+:ph}    r (Var el)    = Var ?wat -- $ r el
--- rename {d=d+:ph}    r (Lam t)     = Lam $ rename ?wat2 t --(ext r) t
--- rename              r (App t1 t2) = App (rename r t1) (rename r t2)
--- rename {d=d+:ph}    r (Shut t)    = Shut ?wat3
--- rename {d=s+:d::ph} r (Open t)    = Open ?wat4
--- rename {d=s+:[]}    r (Open t)    = ?wat5
-
+--SubsetPref : NEList a -> NEList a -> Type
+--SubsetPref {a} g d = {x : a} -> {xs : List a} -> ElemPref x xs g -> ElemPref x xs d
+--
+--relabel : SubsetPref g d -> Term g a -> Term d a
+--relabel {g=g+:gs} {d=d+:ds} s (Var  el)   = Var ?wat
+--relabel {g=g+:gs} {d=d+:ds} s (Lam  t)    = Lam $ relabel ?wat2 t
+--relabel s (App  t u)  = App (relabel s t) (relabel s u)
+--relabel {g=g+:gs} {d=d+:ds} s (Shut t)    = Shut $ relabel ?wat4 t
+--relabel s (Open ep t) = ?wat5
