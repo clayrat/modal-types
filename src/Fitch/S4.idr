@@ -1,4 +1,4 @@
-module Fitch.PfenningK
+module Fitch.S4
 
 import Subset
 import Data.List
@@ -8,18 +8,26 @@ import Fitch.Ty
 %default total
 %access public export
 
+data ElemPref : a -> List a -> NEList a -> Type where
+  HereP : ElemPref x xs (x+:xs)
+  ThereP : ElemPref x xs (y+:ys) -> ElemPref x xs (z+:y::ys)
+
 data Term : NEList (List Ty) -> Ty -> Type where
   Var  : Elem a g -> Term (g +: ph) a
   Lam  : Term ((a::g) +: ph) b -> Term (g +: ph) (a~>b)
   App  : Term gs (a~>b) -> Term gs a -> Term gs b
   Shut : Term ([] +: (g::ph)) a -> Term (g +: ph) (Box a)
-  Open : Term (g +: ph) (Box a) -> Term (d +: g::ph) a
+  Open : Term (g +: ph) (Box a) -> ElemPref g ph ps -> Term ps a
+
+axiomT : Term (g+:ph) (Box a ~> a)
+axiomT = Lam $ Open (Var Here) HereP
 
 axiomK : Term (g+:ph) (Box (a ~> b) ~> Box a ~> Box b)
-axiomK = Lam $ Lam $ Shut $ App (Open $ Var $ There Here) (Open $ Var Here)
+axiomK = Lam $ Lam $ Shut $ App (Open (Var $ There Here) (ThereP HereP))
+                                (Open (Var Here) (ThereP HereP))
 
-soundness : Term ([] +: (g::ph)) a -> Term (d+:(g::ph)) a
-soundness = Open . Shut
+axiom4 : Term (g+:ph) (Box a ~> Box (Box a))
+axiom4 = Lam $ Shut $ Shut $ Open (Var Here) (ThereP $ ThereP HereP)
 
 -- smallstep
 

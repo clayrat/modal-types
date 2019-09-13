@@ -1,4 +1,4 @@
-module Dual.KavvosS4
+module Dual.S4
 
 import Data.List
 import Dual.Ty
@@ -20,7 +20,9 @@ eval : Term d g (Box a ~> a)
 eval = Lam $ Letbox (Var Here) (MVar Here)
 
 axiomK : Term d g (Box (a ~> b) ~> Box a ~> Box b)
-axiomK = Lam $ Lam $ Letbox (Var $ There Here) (Letbox (Var Here) (Shut $ App (MVar $ There Here) (MVar Here)))
+axiomK = Lam $ Lam $ Letbox (Var $ There Here)
+                            (Letbox (Var Here)
+                                    (Shut $ App (MVar $ There Here) (MVar Here)))
 
 axiom4 : Term d g (Box a ~> Box (Box a))
 axiom4 = Lam $ Letbox (Var Here) (Shut $ Shut $ MVar Here)

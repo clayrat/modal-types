@@ -3,9 +3,9 @@ package modal-types
 sourcedir = src
 
 modules = Subset
-        , Dual.KavvosS4
+        , Dual.S4
         , Data.NEList
         , Fitch.IsoFitchKripke
-        , Fitch.PfenningK
+        , Fitch.S4
 
 pkgs = contrib, tparsec
