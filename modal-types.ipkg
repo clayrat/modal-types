@@ -1,0 +1,9 @@
+package modal-types
+
+sourcedir = src
+
+modules = Data.NEList
+        , Fitch.IsoFitchKripke
+        , Fitch.Fitch.PfenningK
+
+pkgs = contrib, tparsec
