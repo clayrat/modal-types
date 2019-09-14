@@ -3,6 +3,9 @@ package modal-types
 sourcedir = src
 
 modules = Subset
+        , Dual.K
+        , Dual.K4
+        , Dual.T
         , Dual.S4
         , Data.NEList
         , Fitch.IsoFitchKripke
