@@ -23,7 +23,7 @@ axiom4 : Term d g (Box a ~> Box (Box a))
 axiom4 = Lam $ Letbox (Var Here) (Shut $ Shut $ Var Here)
 
 -- reduction
-{-
+
 rename : Subset g s -> Term d g a -> Term d s a
 rename r (Var el)     = Var $ r el
 rename r (Lam t)      = Lam $ rename (ext r) t
@@ -41,7 +41,7 @@ renameM : Subset d s -> Term d g a -> Term s g a
 renameM r (Var el)     = Var el
 renameM r (Lam t)      = Lam $ renameM r t
 renameM r (App t u)    = App (renameM r t) (renameM r u)
-renameM r (Shut t)     = Shut $ rename r t
+renameM r (Shut t)     = Shut $ rename r $ renameM r t
 renameM r (Letbox t u) = Letbox (renameM r t) (renameM (ext r) u)
 
 exchM : Term (d1 ++ a::b::d) g c -> Term (d1 ++ b::a::d) g c
@@ -57,25 +57,23 @@ exts : Subst d g s -> Subst d (b::g) (b::s)
 exts _  Here      = Var Here
 exts s (There el) = rename There (s el)
 
-extsM : Subst d g s -> Subst (b::d) (b::g) s
-extsM _  Here      = MVar Here
-extsM s (There el) = renameM There (s el)
+--extsM : Subst d g s -> Subst (b::d) (b::g) s
+--extsM _  Here      = ?wat
+--extsM s (There el) = renameM There (s el)
 
 subst : Subst d g s -> Term d g a -> Term d s a
 subst s (Var el)     = s el
-subst s (MVar el)    = MVar el
 subst s (Lam t)      = Lam $ subst (exts s) t
 subst s (App t u)    = App (subst s t) (subst s u)
 subst s (Shut t)     = Shut t
 subst s (Letbox t u) = Letbox (subst s t) (subst (renameM There . s) u)
 
-substM : Subst s d [] -> Term d g a -> Term s g a
-substM s (Var el)     = Var el
-substM s (MVar el)    = rename absurd $ s el
-substM s (Lam t)      = Lam $ substM s t
-substM s (App t u)    = App (substM s t) (substM s u)
-substM s (Shut t)     = Shut $ substM s t
-substM s (Letbox t u) = Letbox (substM s t) (substM (extsM s) u)
+--substM : Subst s d [] -> Term d g a -> Term s g a
+--substM s (Var el)     = Var el
+--substM s (Lam t)      = Lam $ substM s t
+--substM s (App t u)    = App (substM s t) (substM s u)
+--substM s (Shut t)     = Shut ?wat2
+--substM s (Letbox t u) = Letbox (substM s t) (substM (extsM s) u)
 
 subst1 : Term d (b::g) a -> Term d g b -> Term d g a
 subst1 {d} {g} {b} t s = subst {g=b::g} go t
@@ -84,29 +82,28 @@ subst1 {d} {g} {b} t s = subst {g=b::g} go t
   go  Here      = s
   go (There el) = Var el
 
-subst1M : Term (b::d) g a -> Term d [] b -> Term d g a
-subst1M {d} {g} {b} t s = substM {d=b::d} go t
-  where
-  go : Subst d (b::d) []
-  go  Here      = s
-  go (There el) = MVar el
-
-isVal : Term d g a -> Bool
-isVal (Lam _)  = True
-isVal (Var _)  = True
-isVal (MVar _) = True
-isVal  _       = False
-
-step : Term d g a -> Maybe (Term d g a)
-step (App    (Lam body) sub ) = Just $ subst1 body sub
-step (App     t         u   ) =
-  if isVal t
-    then Nothing
-    else [| App (step t) (pure u) |]
-step (Letbox (Shut sub) body) = Just $ subst1M body sub
-step (Letbox  t         u   ) =
-  if isVal t
-    then Nothing
-    else [| Letbox (step t) (pure u) |]
-step  _                       = Nothing
-  -}
+--subst1M : Term (b::d) g a -> Term d [] b -> Term d g a
+--subst1M {d} {g} {b} t s = substM {d=b::d} go t
+--  where
+--  go : Subst d (b::d) []
+--  go  Here      = s
+--  go (There el) = MVar el
+--
+--isVal : Term d g a -> Bool
+--isVal (Lam _)  = True
+--isVal (Var _)  = True
+--isVal (MVar _) = True
+--isVal  _       = False
+--
+--step : Term d g a -> Maybe (Term d g a)
+--step (App    (Lam body) sub ) = Just $ subst1 body sub
+--step (App     t         u   ) =
+--  if isVal t
+--    then Nothing
+--    else [| App (step t) (pure u) |]
+--step (Letbox (Shut sub) body) = Just $ subst1M body sub
+--step (Letbox  t         u   ) =
+--  if isVal t
+--    then Nothing
+--    else [| Letbox (step t) (pure u) |]
+--step  _                       = Nothing

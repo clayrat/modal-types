@@ -9,7 +9,7 @@ import Subset
 
 data Term : List Ty -> List Ty -> Ty -> Type where
   Var    : Elem a g -> Term d g a
-  MVar    : Elem a d -> Term d g a
+  MVar   : Elem a d -> Term d g a
   Lam    : Term d (a::g) b -> Term d g (a~>b)
   App    : Term d g (a~>b) -> Term d g a -> Term d g b
   Shut   : Term [] d a -> Term d g (Box a)
@@ -24,11 +24,11 @@ axiomK = Lam $ Lam $ Letbox (Var $ There Here)
                             (Letbox (Var Here)
                                     (Shut $ App (Var $ There Here) (Var Here)))
 
-{-
 -- reduction
 
 rename : Subset g s -> Term d g a -> Term d s a
 rename r (Var el)     = Var $ r el
+rename r (MVar el)    = MVar el
 rename r (Lam t)      = Lam $ rename (ext r) t
 rename r (App t u)    = App (rename r t) (rename r u)
 rename r (Shut t)     = Shut t
@@ -42,6 +42,7 @@ contr = rename (pref $ contract Here)
 
 renameM : Subset d s -> Term d g a -> Term s g a
 renameM r (Var el)     = Var el
+renameM r (MVar el)    = MVar $ r el
 renameM r (Lam t)      = Lam $ renameM r t
 renameM r (App t u)    = App (renameM r t) (renameM r u)
 renameM r (Shut t)     = Shut $ rename r t
@@ -52,7 +53,6 @@ exchM = renameM (pref permute)
 
 contrM : Term (d1 ++ a::a::d) g c -> Term (d1 ++ a::d) g c
 contrM = renameM (pref $ contract Here)
-
 
 Subst : List Ty -> List Ty -> List Ty -> Type
 Subst d g s = {x : Ty} -> Elem x g -> Term d s x
@@ -73,13 +73,13 @@ subst s (App t u)    = App (subst s t) (subst s u)
 subst s (Shut t)     = Shut t
 subst s (Letbox t u) = Letbox (subst s t) (subst (renameM There . s) u)
 
-substM : Subst s d [] -> Term d g a -> Term s g a
-substM s (Var el)     = Var el
-substM s (MVar el)    = rename absurd $ s el
-substM s (Lam t)      = Lam $ substM s t
-substM s (App t u)    = App (substM s t) (substM s u)
-substM s (Shut t)     = Shut $ substM s t
-substM s (Letbox t u) = Letbox (substM s t) (substM (extsM s) u)
+--substM : Subst s d [] -> Term d g a -> Term s g a
+--substM s (Var el)     = Var el
+--substM s (MVar el)    = rename absurd $ s el
+--substM s (Lam t)      = Lam $ substM s t
+--substM s (App t u)    = App (substM s t) (substM s u)
+--substM s (Shut t)     = Shut ?wat
+--substM s (Letbox t u) = Letbox (substM s t) (substM (extsM s) u)
 
 subst1 : Term d (b::g) a -> Term d g b -> Term d g a
 subst1 {d} {g} {b} t s = subst {g=b::g} go t
@@ -88,29 +88,28 @@ subst1 {d} {g} {b} t s = subst {g=b::g} go t
   go  Here      = s
   go (There el) = Var el
 
-subst1M : Term (b::d) g a -> Term d [] b -> Term d g a
-subst1M {d} {g} {b} t s = substM {d=b::d} go t
-  where
-  go : Subst d (b::d) []
-  go  Here      = s
-  go (There el) = MVar el
+--subst1M : Term (b::d) g a -> Term d [] b -> Term d g a
+--subst1M {d} {g} {b} t s = substM {d=b::d} go t
+--  where
+--  go : Subst d (b::d) []
+--  go  Here      = s
+--  go (There el) = MVar el
 
-isVal : Term d g a -> Bool
-isVal (Lam _)  = True
-isVal (Var _)  = True
-isVal (MVar _) = True
-isVal  _       = False
-
-step : Term d g a -> Maybe (Term d g a)
-step (App    (Lam body) sub ) = Just $ subst1 body sub
-step (App     t         u   ) =
-  if isVal t
-    then Nothing
-    else [| App (step t) (pure u) |]
-step (Letbox (Shut sub) body) = Just $ subst1M body sub
-step (Letbox  t         u   ) =
-  if isVal t
-    then Nothing
-    else [| Letbox (step t) (pure u) |]
-step  _                       = Nothing
-  -}
+--isVal : Term d g a -> Bool
+--isVal (Lam _)  = True
+--isVal (Var _)  = True
+--isVal (MVar _) = True
+--isVal  _       = False
+--
+--step : Term d g a -> Maybe (Term d g a)
+--step (App    (Lam body) sub ) = Just $ subst1 body sub
+--step (App     t         u   ) =
+--  if isVal t
+--    then Nothing
+--    else [| App (step t) (pure u) |]
+--step (Letbox (Shut sub) body) = Just $ subst1M body sub
+--step (Letbox  t         u   ) =
+--  if isVal t
+--    then Nothing
+--    else [| Letbox (step t) (pure u) |]
+--step  _                       = Nothing
