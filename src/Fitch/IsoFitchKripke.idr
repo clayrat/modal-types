@@ -26,9 +26,9 @@ isoFK = MkIso to fro tofro froto
   fro ((h::hs) +: t)       = h :: (assert_total $ fro (hs +: t))
 
   tofro : (y : NEList (List a)) -> to (fro y) = y
-  tofro ([] +: []) = Refl
-  tofro ([] +: (x :: xs)) = rewrite assert_total $ tofro (x +: xs) in Refl
-  tofro ((x :: xs) +: t) = rewrite assert_total $ tofro (xs +: t) in Refl
+  tofro ([]      +: [])      = Refl
+  tofro ([]      +: (t::ts)) = rewrite assert_total $ tofro (t +: ts) in Refl
+  tofro ((h::hs) +: t)       = rewrite assert_total $ tofro (hs +: t) in Refl
 
   froto : (y : FitchList a) -> fro (to y) = y
   froto []        = Refl

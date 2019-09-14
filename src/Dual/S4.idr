@@ -67,6 +67,12 @@ ctxVal2True : Term d g a -> Term [] (g ++ map Box d) a
 ctxVal2True {g} {d=[]}   t = rewrite appendNilRightNeutral g in t
 ctxVal2True     {d=b::d} t = exch2 $ ctxVal2True $ val2True t
 
+boxDet : Term d g (Box a ~> b) -> Term (a::d) g b
+boxDet t = App (renameM There t) (Shut $ MVar Here)
+
+true2Val : Term d (Box a :: g) b -> Term (a::d) g b
+true2Val = boxDet . Lam
+
 -- reduction
 
 Subst : List Ty -> List Ty -> List Ty -> Type

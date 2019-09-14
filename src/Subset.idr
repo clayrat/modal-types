@@ -35,3 +35,16 @@ pref : Subset g d -> Subset (s++g) (s++d)
 pref {s=[]}    sub  el        = sub el
 pref {s=s::ss} sub  Here      = Here
 pref {s=s::ss} sub (There el) = There $ pref {s=ss} sub el
+
+--
+
+Subset2 : (g : List (List a)) -> (d : List (List a)) -> Type
+Subset2 []      []      = ()
+Subset2 []      (_::_ ) = Void
+Subset2 (_::_ ) []      = Void
+Subset2 (g::gs) (d::ds) = (Subset g d, Subset2 gs ds)
+
+--Initial : (g : List (List a)) -> (d : List (List a)) -> Type
+--Initial []      _       = ()
+--Initial (_::_ ) []      = Void
+--Initial (g::gs) (d::ds) = (Subset g d, Initial gs ds)
