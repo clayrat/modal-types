@@ -27,7 +27,7 @@ axiomK = Lam $ Lam $ Letbox (Var $ There Here)
 axiom4 : Term d g (Box a ~> Box (Box a))
 axiom4 = Lam $ Letbox (Var Here) (Shut $ Shut $ MVar Here)
 
--- reduction
+-- structural rules
 
 rename : Subset g s -> Term d g a -> Term d s a
 rename r (Var el)     = Var $ r el
@@ -50,6 +50,24 @@ renameM r (Letbox t u) = Letbox (renameM r t) (renameM (ext r) u)
 
 exchM : Term (d1 ++ a::b::d) g c -> Term (d1 ++ b::a::d) g c
 exchM = renameM (pref permute)
+
+-- logic properties
+
+det : Term d g (a ~> b) -> Term d (a::g) b
+det t = App (rename There t) (Var Here)
+
+exch2 : Term d (a::g1 ++ g) b -> Term d (g1 ++ a::g) b
+exch2 {g1=[]}    t = t
+exch2 {g1=c::g1} t = det $ exch2 {g1} $ Lam $ exch {g1=[]} t
+
+val2True : Term (a::d) g b -> Term d (Box a :: g) b
+val2True t = Letbox (Var Here) (rename There t)
+
+ctxVal2True : Term d g a -> Term [] (g ++ map Box d) a
+ctxVal2True {g} {d=[]}   t = rewrite appendNilRightNeutral g in t
+ctxVal2True     {d=b::d} t = exch2 $ ctxVal2True $ val2True t
+
+-- reduction
 
 Subst : List Ty -> List Ty -> List Ty -> Type
 Subst d g s = {x : Ty} -> Elem x g -> Term d s x
