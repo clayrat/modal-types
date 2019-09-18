@@ -41,7 +41,7 @@ data Term : List Ty -> List Ty -> Ty -> Type where
   Lam     : Term (a::l) g b -> Term l g (a~>b)
   App     : Split l l1 l2 -> Term l1 g (a~>b) -> Term l2 g a -> Term l g b
   Shut    : Term [] g a -> Term [] g (Bang a)
-  Letbang : Split l l1 l2 -> Term l1 g (Bang a) -> Term l2 (a::g) b -> Term l g b   -- let !t1 = t2 in t3
+  Letbang : Split l l1 l2 -> Term l1 g (Bang a) -> Term l2 (a::g) b -> Term l g b   -- let !a = t in u
 
 ok : Term [] g (a ~> a)
 ok = Lam Var
@@ -71,6 +71,16 @@ discard t u = Letbang splitLeft (rename absurd t) (rename There u)
 
 derelict : Term [] g (Bang a) -> Term [] g a
 derelict t = Letbang Nil t (IVar Here)
+
+-- aka contraction
+copy : Term l [] (Bang a) -> Term [] (a :: a :: g) b -> Term l g b
+copy t u = Letbang splitLeft (rename absurd t) (rename (contract Here) u)
+
+promote1 : Term l [] (Bang a) -> Term [] [a] b -> Term l [] (Bang b)
+promote1 t u = Letbang splitLeft t (Shut u)
+
+promote2 : Split l l1 l2 -> Term l1 [] (Bang a) -> Term l2 [] (Bang b) -> Term [] [b,a] c -> Term l [] (Bang c)
+promote2 sp t1 t2 u = Letbang sp t1 (Letbang splitLeft (rename absurd t2) (Shut u))
 
 substI1 : Term l (a::g) b -> Term [] g a -> Term l g b
 substI1  Var              v = Var
