@@ -11,5 +11,6 @@ modules = Subset
         , Fitch.IsoFitchKripke
         , Fitch.K
         , Fitch.S4
+        , DILL
 
 pkgs = contrib, tparsec

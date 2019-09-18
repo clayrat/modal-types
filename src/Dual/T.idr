@@ -13,7 +13,7 @@ data Term : List Ty -> List Ty -> Ty -> Type where
   Lam    : Term d (a::g) b -> Term d g (a~>b)
   App    : Term d g (a~>b) -> Term d g a -> Term d g b
   Shut   : Term [] d a -> Term d g (Box a)
-  Letbox : Term d g (Box a) -> Term (a::d) g c -> Term d g c
+  Letbox : Term d g (Box a) -> Term (a::d) g b -> Term d g b
 
 -- aka axiom T
 eval : Term d g (Box a ~> a)
