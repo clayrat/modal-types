@@ -65,8 +65,17 @@ rename r (Letbang s t u) = Letbang s (rename r t) (rename (ext r) u)
 discard : Term l [] (Bang a) -> Term [] g b -> Term l g b
 discard t u = Letbang splitLeft (rename absurd t) (rename There u)
 
-derelict : Term [] g (Bang a) -> Term [] g a
-derelict t = Letbang Nil t (IVar Here)
+-- aka eval/axiom T
+derelict : Term [] g (Bang a ~> a)
+derelict = Lam $ Letbang splitLeft Var (IVar Here)
+
+axiomK : Term [] g (Bang (a ~> b) ~> Bang a ~> Bang b)
+axiomK = Lam $ Lam $ Letbang (ConsL $ ConsR Nil) Var
+                             (Letbang splitLeft Var (Lift $ App Nil (IVar Here) (IVar $ There Here)))
+
+-- aka axiom4
+dig : Term [] g (Bang a ~> Bang (Bang a))
+dig = Lam $ Letbang splitLeft Var (Lift $ Lift $ IVar Here)
 
 -- aka contraction
 copy : Term l [] (Bang a) -> Term [] (a :: a :: g) b -> Term l g b

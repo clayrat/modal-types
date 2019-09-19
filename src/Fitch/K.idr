@@ -12,7 +12,7 @@ data Term : List (List Ty) -> List Ty -> Ty -> Type where
   Lam  : Term ph (a::g) b -> Term ph g (a~>b)
   App  : Term ph g (a~>b) -> Term ph g a -> Term ph g b
   Shut : Term (g::ph) [] a -> Term ph g (Box a)         -- ~quasiquote
-  Open : Term ph g (Box a) -> Term (g::ph) d a          -- ~unquote
+  Open : Term ph g (Box a) -> Term (g::ph) d a          -- ~unquote0
 
 axiomK : Term ph g (Box (a ~> b) ~> Box a ~> Box b)
 axiomK = Lam $ Lam $ Shut $ App (Open $ Var $ There Here)

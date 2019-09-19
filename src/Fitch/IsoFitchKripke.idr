@@ -15,7 +15,7 @@ isoFK : Iso (FitchList a) (NEList (List a))
 isoFK = MkIso to fro tofro froto
   where
 
-  to :  FitchList a -> NEList (List a)
+  to : FitchList a -> NEList (List a)
   to []        = [] +: []
   to (Lock xs) = let ih = to xs in [] +: (head ih :: tail ih)
   to (x::xs)   = let ih = to xs in (x::head ih) +: tail ih
