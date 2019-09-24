@@ -30,7 +30,16 @@ pure = Lam $ Val $ Wrap $ Var Here
 
 flatten : Term g (M (M a) ~> M a)
 flatten = Lam $ Val $ Letval (Var Here)
-                             (Letval (Var Here) (Wrap $ Var Here))
+                             (Letval (Var Here)
+                                     (Wrap $ Var Here))
 
 map : Term g ((a ~> b) ~> M a ~> M b)
-map = Lam $ Lam $ Val $ Letval (Var Here) (Wrap $ App (Var $ There $ There Here) (Var Here))
+map = Lam $ Lam $ Val $ Letval (Var Here)
+                               (Wrap $ App (Var $ There $ There Here)
+                                           (Var Here))
+
+flatMap : Term g ((a ~> M b) ~> M a ~> M b)
+flatMap = Lam $ Lam $ Val $ Letval (Var Here)
+                                   (Letval (App (Var $ There $ There Here)
+                                                (Var Here))
+                                           (Wrap $ Var Here))
