@@ -6,6 +6,10 @@ import Data.List
 %access public export
 %default total
 
+elemMap : {x : a} -> {xs : List a} -> (f : a -> b) -> Elem x xs -> Elem (f x) (map f xs)
+elemMap f  Here      = Here
+elemMap f (There el) = There $ elemMap f el
+
 Subset : (g : List a) -> (d : List a) -> Type
 Subset {a} g d = {x : a} -> Elem x g -> Elem x d
 

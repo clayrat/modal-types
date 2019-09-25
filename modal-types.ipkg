@@ -9,6 +9,7 @@ modules = Subset
         , Dual.S4
         , Moggi
         , Dual.S4dia
+        , Moggi2S4dia
         , Data.NEList
         , Fitch.IsoFitchKripke
         , Fitch.K
