@@ -3,6 +3,7 @@ package modal-types
 sourcedir = src
 
 modules = Subset
+        , Split
         , Dual.K
         , Dual.K4
         , Dual.T
@@ -15,5 +16,6 @@ modules = Subset
         , Fitch.K
         , Fitch.S4
         , DILL
+        , LamCirc
 
 pkgs = contrib, tparsec

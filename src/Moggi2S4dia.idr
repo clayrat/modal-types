@@ -8,6 +8,11 @@ import Subset
 %default total
 %access public export
 
+-- `Box a` denotes stable values, that is, values that survive effects
+-- `Dia a` denotes computations returning values of type `a`
+-- In the monadic metalanguage, all values are stable, so a function `a~>b` accepts a stable value of type `a` and returns a value of type `b`
+-- `M a` is a computation which returns a stable value of type `a`
+
 embedTy : MG.Ty -> S4.Ty
 embedTy  A        = A
 embedTy (Imp a b) = Imp (Box (embedTy a)) (embedTy b)

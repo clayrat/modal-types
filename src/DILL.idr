@@ -2,6 +2,7 @@ module DILL
 
 import Data.List
 import Subset
+import Split
 
 %default total
 %access public export
@@ -13,23 +14,6 @@ data Ty = A
 infixr 5 ~>
 (~>) : Ty -> Ty -> Ty
 (~>) = Imp
-
-data Split : List Ty -> List Ty -> List Ty -> Type where
-  Nil : Split [] [] []
-  ConsR : Split xs xs1 xs2 -> Split (x :: xs)      xs1 (x :: xs2)
-  ConsL : Split xs xs1 xs2 -> Split (x :: xs) (x:: xs1)      xs2
-
-splitLeft : Split l l []
-splitLeft {l=[]}   = Nil
-splitLeft {l=_::_} = ConsL $ splitLeft
-
-splitLen : Split l l1 l2 -> length l = length l1 + length l2
-splitLen                   Nil      = Refl
-splitLen {l1} {l2=_::xs2} (ConsR s) =
-  rewrite plusAssociative (length l1) 1 (length xs2) in
-  rewrite plusCommutative (length l1) 1 in
-  cong $ splitLen s
-splitLen                  (ConsL s) = cong $ splitLen s
 
 data Term : List Ty -> List Ty -> Ty -> Type where
   Var     : Term [a] g a
