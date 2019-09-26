@@ -1,4 +1,4 @@
-module DILL
+module Linear.DILL
 
 import Data.List
 import Subset

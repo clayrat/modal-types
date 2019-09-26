@@ -4,7 +4,7 @@ module Split
 %default total
 
 data Split : List a -> List a -> List a -> Type where
-  Nil : Split [] [] []
+  Nil   : Split [] [] []
   ConsR : Split xs ls rs -> Split (x::xs)     ls (x::rs)
   ConsL : Split xs ls rs -> Split (x::xs) (x::ls)    rs
 
