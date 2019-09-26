@@ -24,7 +24,7 @@ axiomK = Lam $ Lam $ Letbox (Var $ There Here)
                             (Letbox (Var Here)
                                     (Shut $ App (Var $ There Here) (Var Here)))
 
--- reduction
+-- structural
 
 rename : Subset g s -> Term d g a -> Term d s a
 rename r (Var el)     = Var $ r el
@@ -53,6 +53,17 @@ exchM = renameM (pref permute)
 
 contrM : Term (d1 ++ a::a::d) g c -> Term (d1 ++ a::d) g c
 contrM = renameM (pref $ contract Here)
+
+derelict : Term d (a::g) b -> Term (a::d) g b
+derelict (Var Here)      = MVar Here
+derelict (Var (There e)) = Var e
+derelict (MVar e)        = MVar $ There e
+derelict (Lam t)         = Lam $ assert_total $ derelict $ rename permute t
+derelict (App u v)       = App (derelict u) (derelict v)
+derelict (Shut t)        = Shut $ rename There t
+derelict (Letbox u v)    = Letbox (derelict u) (renameM permute $ derelict v)
+
+-- reduction
 
 Subst : List Ty -> List Ty -> List Ty -> Type
 Subst d g s = {x : Ty} -> Elem x g -> Term d s x
