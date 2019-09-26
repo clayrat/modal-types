@@ -8,6 +8,7 @@ modules = Subset
         , Dual.K4
         , Dual.T
         , Dual.S4
+        , Dual.GL
         , Moggi
         , Dual.S4dia
         , Moggi2S4dia
