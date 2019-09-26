@@ -7,18 +7,22 @@ import Split
 %default total
 %access public export
 
-data Ty = A
-        | Imp Ty Ty
-        | Lmp Ty Ty
-        | F Ty
-        | G Ty
+mutual
+  data Ty = A
+          | Imp Ty Ty
+          | G LTy
+
+  data LTy = LA
+           | F Ty
+           | Lmp LTy LTy
+
 
 infixr 5 ~>
 (~>) : Ty -> Ty -> Ty
 (~>) = Imp
 
 infixr 5 ~*
-(~*) : Ty -> Ty -> Ty
+(~*) : LTy -> LTy -> LTy
 (~*) = Lmp
 
 mutual
@@ -28,7 +32,7 @@ mutual
     App : Term t (a~>b) -> Term t a -> Term t b
     GG  : LTerm t [] a -> Term t (G a)
 
-  data LTerm : List Ty -> List Ty -> Ty -> Type where
+  data LTerm : List Ty -> List LTy -> LTy -> Type where
     LVar : LTerm t [a] a
     LLam : LTerm t (a::g) b -> LTerm t g (a~*b)
     LApp : Split g l r -> LTerm t l (a~*b) -> LTerm t r a -> LTerm t g a
