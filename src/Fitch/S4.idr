@@ -7,23 +7,23 @@ import Fitch.Ty
 %default total
 %access public export
 
-data ElemPref : a -> List a -> a -> List a -> Type where
-  HereP : ElemPref x xs x xs
-  ThereP : ElemPref x xs y ys -> ElemPref x xs z (y::ys)
+data Pref : a -> List a -> a -> List a -> Type where
+  HereP  : Pref x xs x xs
+  ThereP : Pref x xs y ys -> Pref x xs z (y::ys)
 
 data Term : List (List Ty) -> List Ty -> Ty -> Type where
   Var  : Elem a g -> Term ph g a
   Lam  : Term ph (a::g) b -> Term ph g (a~>b)
   App  : Term ph g (a~>b) -> Term ph g a -> Term ph g b
-  Shut : Term (g::ph) [] a -> Term ph g (Box a)                 -- ~quasiquote
-  Open : ElemPref g ph d ps -> Term ph g (Box a) -> Term ps d a -- ~unquote
-
-axiomT : Term ph g (Box a ~> a)
-axiomT = Lam $ Open HereP (Var Here)
+  Shut : Term (g::ph) [] a -> Term ph g (Box a)             -- ~quasiquote
+  Open : Pref g ph d ps -> Term ph g (Box a) -> Term ps d a -- ~unquoteN
 
 axiomK : Term ph g (Box (a ~> b) ~> Box a ~> Box b)
 axiomK = Lam $ Lam $ Shut $ App (Open (ThereP HereP) (Var $ There Here))
                                 (Open (ThereP HereP) (Var Here))
+
+axiomT : Term ph g (Box a ~> a)
+axiomT = Lam $ Open HereP (Var Here)
 
 axiom4 : Term ph g (Box a ~> Box (Box a))
 axiom4 = Lam $ Shut $ Shut $ Open (ThereP $ ThereP HereP) (Var Here)

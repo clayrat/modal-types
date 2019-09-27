@@ -6,13 +6,10 @@ import Subset
 %default total
 %access public export
 
-data Ty = A
-        | Imp Ty Ty
-        | M Ty     -- effect
-
 infixr 5 ~>
-(~>) : Ty -> Ty -> Ty
-(~>) = Imp
+data Ty = A
+        | (~>) Ty Ty
+        | M Ty       -- effect
 
 mutual
   data Term : List Ty -> Ty -> Type where
@@ -25,6 +22,11 @@ mutual
     Wrap   : Term g a -> PTerm g a
     Letval : Term g (M a) -> PTerm (a::g) b -> PTerm g b
 
+map : Term g ((a ~> b) ~> M a ~> M b)
+map = Lam $ Lam $ Val $ Letval (Var Here)
+                               (Wrap $ App (Var $ There $ There Here)
+                                           (Var Here))
+
 pure : Term g (a ~> M a)
 pure = Lam $ Val $ Wrap $ Var Here
 
@@ -32,11 +34,6 @@ flatten : Term g (M (M a) ~> M a)
 flatten = Lam $ Val $ Letval (Var Here)
                              (Letval (Var Here)
                                      (Wrap $ Var Here))
-
-map : Term g ((a ~> b) ~> M a ~> M b)
-map = Lam $ Lam $ Val $ Letval (Var Here)
-                               (Wrap $ App (Var $ There $ There Here)
-                                           (Var Here))
 
 flatMap : Term g ((a ~> M b) ~> M a ~> M b)
 flatMap = Lam $ Lam $ Val $ Letval (Var Here)

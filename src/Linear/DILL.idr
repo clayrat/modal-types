@@ -7,32 +7,32 @@ import Split
 %default total
 %access public export
 
-infixr 5 ~>
+infixr 5 ~*
 data Ty = A
-        | (~>) Ty Ty
+        | (~*) Ty Ty
         | Bang Ty     -- intuitionistic type
 
 data Term : List Ty -> List Ty -> Ty -> Type where
   Var     : Term [a] g a
   IVar    : Elem a g -> Term [] g a
-  Lam     : Term (a::l) g b -> Term l g (a~>b)
-  App     : Split l l1 l2 -> Term l1 g (a~>b) -> Term l2 g a -> Term l g b
+  Lam     : Term (a::l) g b -> Term l g (a~*b)
+  App     : Split l l1 l2 -> Term l1 g (a~*b) -> Term l2 g a -> Term l g b
   Lift    : Term [] g a -> Term [] g (Bang a)
   Letbang : Split l l1 l2 -> Term l1 g (Bang a) -> Term l2 (a::g) b -> Term l g b   -- let !a = t in u
 
-ok : Term [] g (a ~> a)
+ok : Term [] g (a ~* a)
 ok = Lam Var
 
-ok2 : Term [] g (a ~> Bang b ~> a)
+ok2 : Term [] g (a ~* Bang b ~* a)
 ok2 = Lam $ Lam $ Letbang (ConsL $ ConsR Nil) Var Var
 
-ok3 : Term [] g (Bang b ~> a ~> a)
+ok3 : Term [] g (Bang b ~* a ~* a)
 ok3 = Lam $ Lam $ Letbang (ConsR $ ConsL Nil) Var Var
 
--- bad : Term [] [] (b ~> a ~> a)
+-- bad : Term [] [] (b ~* a ~* a)
 -- bad = Lam $ Lam $ Letbang (ConsR $ ConsL Nil) ?wat Var
 
--- bad2 : Term [] [] (a ~> b ~> a)
+-- bad2 : Term [] [] (a ~* b ~* a)
 -- bad2 = Lam $ Lam $ Letbang (ConsL $ ConsR Nil) ?wat Var
 
 rename : Subset g d -> Term l g a -> Term l d a
@@ -47,15 +47,15 @@ discard : Term l [] (Bang a) -> Term [] g b -> Term l g b
 discard t u = Letbang splitLeft (rename absurd t) (rename There u)
 
 -- aka eval/axiom T
-derelict : Term [] g (Bang a ~> a)
+derelict : Term [] g (Bang a ~* a)
 derelict = Lam $ Letbang splitLeft Var (IVar Here)
 
-axiomK : Term [] g (Bang (a ~> b) ~> Bang a ~> Bang b)
+axiomK : Term [] g (Bang (a ~* b) ~* Bang a ~* Bang b)
 axiomK = Lam $ Lam $ Letbang (ConsL $ ConsR Nil) Var
                              (Letbang splitLeft Var (Lift $ App Nil (IVar Here) (IVar $ There Here)))
 
 -- aka axiom4
-dig : Term [] g (Bang a ~> Bang (Bang a))
+dig : Term [] g (Bang a ~* Bang (Bang a))
 dig = Lam $ Letbang splitLeft Var (Lift $ Lift $ IVar Here)
 
 -- aka contraction

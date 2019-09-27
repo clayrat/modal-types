@@ -15,14 +15,14 @@ data Term : List Ty -> List Ty -> Ty -> Type where
   Shut   : Term d [] a -> Term d g (Box a)
   Letbox : Term d g (Box a) -> Term (a::d) g b -> Term d g b
 
--- aka axiom T
-eval : Term d g (Box a ~> a)
-eval = Lam $ Letbox (Var Here) (MVar Here)
-
 axiomK : Term d g (Box (a ~> b) ~> Box a ~> Box b)
 axiomK = Lam $ Lam $ Letbox (Var $ There Here)
                             (Letbox (Var Here)
                                     (Shut $ App (MVar $ There Here) (MVar Here)))
+
+-- aka axiom T
+eval : Term d g (Box a ~> a)
+eval = Lam $ Letbox (Var Here) (MVar Here)
 
 axiom4 : Term d g (Box a ~> Box (Box a))
 axiom4 = Lam $ Letbox (Var Here) (Shut $ Shut $ MVar Here)
