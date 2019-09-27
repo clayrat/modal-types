@@ -7,13 +7,10 @@ import Split
 %default total
 %access public export
 
-data Ty = A
-        | Imp Ty Ty
-        | Bang Ty     -- intuitionistic type
-
 infixr 5 ~>
-(~>) : Ty -> Ty -> Ty
-(~>) = Imp
+data Ty = A
+        | (~>) Ty Ty
+        | Bang Ty     -- intuitionistic type
 
 data Term : List Ty -> List Ty -> Ty -> Type where
   Var     : Term [a] g a
