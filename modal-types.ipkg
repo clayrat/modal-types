@@ -20,4 +20,4 @@ modules = Subset
         , Linear.LNL
         , LamCirc
 
-pkgs = contrib, tparsec
+pkgs = contrib

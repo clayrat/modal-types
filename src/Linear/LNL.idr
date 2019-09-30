@@ -76,3 +76,9 @@ mutual
 
 weaken : LTerm g [] (Bang a) -> LTerm [] d b -> LTerm g d b
 weaken u v = LetF splitRight u (renameL absurd v)
+
+mapF : Term g (a ~> b) -> LTerm g [] (F a ~* F b)
+mapF t = LLam $ LetF splitLeft LVar (FF $ App (rename There t) (Var Here))
+
+mapG : LTerm g [] (a ~* b) -> Term g (G a ~> G b)
+mapG t = Lam $ GG $ LApp Nil (renameL There t) (Der $ Var Here)
