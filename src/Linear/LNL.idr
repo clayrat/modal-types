@@ -63,6 +63,9 @@ dig = LLam $ LetF splitLeft LVar (FF $ GG $ FF $ Var Here)
 introGF : Term g (a ~> G (F a))
 introGF = Lam $ GG $ FF $ Var Here
 
+flatten : Term g (G (F (G (F a))) ~> G (F a))
+flatten = Lam $ GG $ LetF Nil (Der $ Var Here) (Der $ Var Here)
+
 mutual
   rename : Subset g d -> Term g a -> Term d a
   rename s (Var e)   = Var $ s e
