@@ -51,13 +51,17 @@ axiomK = LLam $ LLam $ LetF (ConsL $ ConsR Nil) LVar
                             (LetF splitLeft LVar
                                            (FF $ GG $ LApp Nil (Der $ Var Here) (Der $ Var $ There Here)))
 
--- aka eval/axiom T
+-- aka eval/axiom T/counit of F -| G
 derelict : LTerm g [] (Bang a ~* a)
 derelict = LLam $ LetF splitLeft LVar (Der $ Var Here)
 
 -- aka axiom4
 dig : LTerm g [] (Bang a ~* Bang (Bang a))
 dig = LLam $ LetF splitLeft LVar (FF $ GG $ FF $ Var Here)
+
+-- unit of F -| G
+introGF : Term g (a ~> G (F a))
+introGF = Lam $ GG $ FF $ Var Here
 
 mutual
   rename : Subset g d -> Term g a -> Term d a
