@@ -17,6 +17,7 @@ modules = Subset
         , Fitch.K
         , Fitch.S4
         , Linear.DILL
+        , Linear.DILLten
         , Linear.LNL
         , LamCirc
 
