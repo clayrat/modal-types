@@ -19,13 +19,13 @@ data Term : List Ty -> List Ty -> Ty -> Type where
   Var     : Term [a] g a
   IVar    : Elem a g -> Term [] g a
   MkI     : Term [] g I
-  LetI    : Split l l1 l2 -> Term l1 g I -> Term l2 g a -> Term l g a
+  LetI    : Split l l1 l2 -> Term l1 g I -> Term l2 g a -> Term l g a                 -- let * = t in u
   MkTen   : Split l l1 l2 -> Term l1 g a -> Term l2 g b -> Term l g (Ten a b)
-  LetTen  : Split l l1 l2 -> Term l1 g (Ten a b) -> Term (b::a::l2) g c -> Term l g c
+  LetTen  : Split l l1 l2 -> Term l1 g (Ten a b) -> Term (b::a::l2) g c -> Term l g c -- let (a,b) = t in u
   Lam     : Term (a::l) g b -> Term l g (a~*b)
   App     : Split l l1 l2 -> Term l1 g (a~*b) -> Term l2 g a -> Term l g b
   Lift    : Term [] g a -> Term [] g (Bang a)
-  Letbang : Split l l1 l2 -> Term l1 g (Bang a) -> Term l2 (a::g) b -> Term l g b   -- let !a = t in u
+  Letbang : Split l l1 l2 -> Term l1 g (Bang a) -> Term l2 (a::g) b -> Term l g b     -- let !a = t in u
 
 ok : Term [] g (a ~* a)
 ok = Lam Var
