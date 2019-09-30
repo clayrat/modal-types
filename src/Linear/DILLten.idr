@@ -54,8 +54,14 @@ symTen = Lam $ LetTen splitLeft Var (MkTen (ConsL $ ConsR Nil) Var Var)
 idL : Term [] g (Ten I a ~* a)
 idL = Lam $ LetTen splitLeft Var $ LetI (ConsR $ ConsL Nil) Var Var
 
+idL' : Term [] g (a ~* Ten I a)
+idL' = Lam $ MkTen splitRight MkI Var
+
 idR : Term [] g (Ten a I ~* a)
 idR = Lam $ LetTen splitLeft Var $ LetI (ConsL $ ConsR Nil) Var Var
+
+idR' : Term [] g (a ~* Ten a I)
+idR' = Lam $ MkTen splitLeft Var MkI
 
 assocTen : Term [] g (Ten (Ten a b) c ~* Ten a (Ten b c))
 assocTen = Lam $ LetTen splitLeft Var
