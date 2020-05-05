@@ -66,6 +66,12 @@ introGF = Lam $ GG $ FF $ Var Here
 flatten : Term g (G (F (G (F a))) ~> G (F a))
 flatten = Lam $ GG $ LetF Nil (Der $ Var Here) (Der $ Var Here)
 
+mapGF : Term g ((a ~> b) ~> G (F a) ~> G (F b))
+mapGF = Lam $ Lam $ GG $ LetF Nil (Der $ Var Here) (FF $ App (Var $ There $ There Here) (Var Here))
+
+flatMap : Term g ((a ~> G (F b)) ~> G (F a) ~> G (F b))
+flatMap = Lam $ Lam $ GG $ LetF Nil (Der $ Var Here) (Der $ App (Var $ There $ There Here) (Var Here))
+
 mutual
   rename : Subset g d -> Term g a -> Term d a
   rename s (Var e)   = Var $ s e
