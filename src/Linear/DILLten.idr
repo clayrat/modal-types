@@ -122,6 +122,10 @@ substI1 : Term l (a::g) b -> Term [] g a -> Term l g b
 substI1  Var              v = Var
 substI1 (IVar Here)       v = v
 substI1 (IVar (There el)) v = IVar el
+substI1  MkI              v = MkI
+substI1 (LetI s t u)      v = LetI s (substI1 t v) (substI1 u v)
+substI1 (MkTen s t u)     v = MkTen s (substI1 t v) (substI1 u v)
+substI1 (LetTen s t u)    v = LetTen s (substI1 t v) (substI1 u v)
 substI1 (Lam t)           v = Lam $ substI1 t v
 substI1 (App s t u)       v = App s (substI1 t v) (substI1 u v)
 substI1 (Lift t)          v = Lift $ substI1 t v

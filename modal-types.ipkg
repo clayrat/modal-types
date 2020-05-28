@@ -4,6 +4,7 @@ sourcedir = src
 
 modules = Subset
         , Split
+        , Dual.Ty
         , Dual.K
         , Dual.K4
         , Dual.T
@@ -14,6 +15,7 @@ modules = Subset
         , Moggi2S4dia
         , Data.NEList
         , Fitch.IsoFitchKripke
+        , Fitch.Ty
         , Fitch.K
         , Fitch.S4
         , Linear.DILL

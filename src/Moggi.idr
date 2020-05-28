@@ -6,10 +6,13 @@ import Subset
 %default total
 %access public export
 
-infixr 5 ~>
 data Ty = A
-        | (~>) Ty Ty
+        | Imp Ty Ty
         | M Ty       -- effect
+
+infixr 5 ~>
+(~>) : Ty -> Ty -> Ty
+(~>) = Imp
 
 mutual
   data Term : List Ty -> Ty -> Type where
