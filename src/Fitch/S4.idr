@@ -11,6 +11,13 @@ data Pref : a -> List a -> a -> List a -> Type where
   HereP  : Pref x xs x xs
   ThereP : Pref x xs y ys -> Pref x xs z (y::ys)
 
+prefSub : Subset g d -> Pairwise Subset ph ps -> Pref x xs g ph -> (y ** ys ** (Subset x y, Pairwise Subset xs ys, Pref y ys d ps))
+prefSub {d}        {ps}       s     ss   HereP      = (d ** ps ** (s, ss, HereP))
+prefSub {ph=p::ph} {ps=[]}    s     ss  (ThereP ep) = absurd ss
+prefSub {ph=p::ph} {ps=q::ps} _ (s1,ss) (ThereP ep) =
+  let (y**ys**(s2,ss2,epp)) = prefSub s1 ss ep in
+  (y**ys**(s2, ss2, ThereP epp))
+
 data Term : List (List Ty) -> List Ty -> Ty -> Type where
   Var  : Elem a g -> Term ph g a
   Lam  : Term ph (a::g) b -> Term ph g (a~>b)
@@ -28,16 +35,11 @@ axiomT = Lam $ Open HereP (Var Here)
 axiom4 : Term ph g (Box a ~> Box (Box a))
 axiom4 = Lam $ Shut $ Shut $ Open (ThereP $ ThereP HereP) (Var Here)
 
--- smallstep
-
-rename : Subset g d -> Subset2 ph ps -> Term ph g a -> Term ps d a
-rename                           s     _   (Var el)            = Var $ s el
-rename                           s     s2  (Lam t)             = Lam $ rename (ext s) s2 t
-rename                           s     s2  (App t u)           = App (rename s s2 t) (rename s s2 u)
-rename {g} {d}                   s     s2  (Shut t)            = Shut $ rename id (MkPair {A=Subset g d} s s2) t
-rename {ph=[]}      {ps=[]}      s     s2  (Open HereP t)      = Open HereP (rename s () t)
-rename {ph=[]}      {ps=[]}      _     _   (Open (ThereP _) _) impossible
-rename {ph=_::_}    {ps=[]}      _     s2  (Open ep t)         = absurd s2
-rename {ph=[]}      {ps=_::_}    _     s2  (Open ep t)         = absurd s2
-rename {ph=ph::phs} {ps=ps::pss} s (q, s2) (Open HereP t)         = Open HereP (rename s (MkPair {A=Subset ph ps} q s2) t)
-rename {ph=ph::phs} {ps=ps::pss} _ (q, s2) (Open (ThereP ep) t)         = Open ?wat4 (rename ?wat5 ?wat6 t)
+rename : Subset g d -> Pairwise Subset ph ps -> Term ph g a -> Term ps d a
+rename                           s     _   (Var el)             = Var $ s el
+rename                           s     ss  (Lam t)              = Lam $ rename (ext s) ss t
+rename                           s     ss  (App t u)            = App (rename s ss t) (rename s ss u)
+rename {g} {d}                   s     ss  (Shut t)             = Shut $ rename id (MkPair {A=Subset g d} s ss) t
+rename                           s     ss  (Open ep t)          =
+  let (y**ys**(s2,ss2,ep2)) = prefSub s ss ep in
+  Open ep2 (rename s2 ss2 t)

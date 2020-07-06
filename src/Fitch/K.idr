@@ -18,10 +18,10 @@ axiomK : Term ph g (Box (a ~> b) ~> Box a ~> Box b)
 axiomK = Lam $ Lam $ Shut $ App (Open $ Var $ There Here)
                                 (Open $ Var Here)
 
-rename : Subset g d -> Subset2 ph ps -> Term ph g a -> Term ps d a
+rename : Subset g d -> Pairwise Subset ph ps -> Term ph g a -> Term ps d a
 rename           s     _   (Var el)  = Var $ s el
-rename           s     s2  (Lam t)   = Lam $ rename (ext s) s2 t
-rename           s     s2  (App t u) = App (rename s s2 t) (rename s s2 u)
-rename {g} {d}   s     s2  (Shut t)  = Shut $ rename id (MkPair {A=Subset g d} s s2) t
-rename {ps=[]}   _     s2  (Open _)  = absurd s2
-rename {ps=_::_} _ (q, s2) (Open t)  = Open $ rename q s2 t
+rename           s     ss  (Lam t)   = Lam $ rename (ext s) ss t
+rename           s     ss  (App t u) = App (rename s ss t) (rename s ss u)
+rename {g} {d}   s     ss  (Shut t)  = Shut $ rename id (MkPair {A=Subset g d} s ss) t
+rename {ps=[]}   _     ss  (Open _)  = absurd ss
+rename {ps=_::_} _ (q, ss) (Open t)  = Open $ rename q ss t
