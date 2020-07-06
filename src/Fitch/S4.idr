@@ -13,7 +13,7 @@ data Pref : a -> List a -> a -> List a -> Type where
 
 prefSub : Subset g d -> Pairwise Subset ph ps -> Pref x xs g ph -> (y ** ys ** (Subset x y, Pairwise Subset xs ys, Pref y ys d ps))
 prefSub {d}        {ps}       s     ss   HereP      = (d ** ps ** (s, ss, HereP))
-prefSub {ph=p::ph} {ps=[]}    s     ss  (ThereP ep) = absurd ss
+prefSub {ph=p::ph} {ps=[]}    _     ss  (ThereP _)  = absurd ss
 prefSub {ph=p::ph} {ps=q::ps} _ (s1,ss) (ThereP ep) =
   let (y**ys**(s2,ss2,epp)) = prefSub s1 ss ep in
   (y**ys**(s2, ss2, ThereP epp))
@@ -41,5 +41,5 @@ rename         s ss (Lam t)     = Lam $ rename (ext s) ss t
 rename         s ss (App t u)   = App (rename s ss t) (rename s ss u)
 rename {g} {d} s ss (Shut t)    = Shut $ rename id (MkPair {A=Subset g d} s ss) t
 rename         s ss (Open ep t) =
-  let (y**ys**(s2,ss2,ep2)) = prefSub s ss ep in
+  let (_**_**(s2,ss2,ep2)) = prefSub s ss ep in
   Open ep2 (rename s2 ss2 t)
