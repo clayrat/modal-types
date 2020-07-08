@@ -28,10 +28,13 @@ data Term : List BoxT -> List Ty -> Ty -> Type where
   Letbox : Term d g (Box ps a) -> Term (MkBox ps a::d) g b -> Term d g b
 
 weak : Term d g (Box [b] a ~> Box [b,c] a)
-weak = Lam $ Letbox (Var Here) (Shut $ MVar Here)
+weak = Lam $ Letbox (Var Here) (Shut $ MVar Here) -- {e=[Var Here]}
 
 contract : Term d g (Box [b,b] a ~> Box [b] a)
-contract = Lam $ Letbox (Var Here) (Shut $ MVar Here)
+contract = Lam $ Letbox (Var Here) (Shut $ MVar Here) -- {e=[Var Here, Var Here]}
+
+exch : Term d g (Box [b,c] a ~> Box [c,b] a)
+exch = Lam $ Letbox (Var Here) (Shut $ MVar Here) --{e=[Var $ There Here, Var Here]}
 
 triv : Term d g (Box [a] a)
 triv = Shut $ Var Here
@@ -40,28 +43,31 @@ comp : Term d g (Box [a] b ~> Box [a] (Box [b] c) ~> Box [a] c)
 comp = Lam $ Lam $ Letbox (Var $ There Here) $
                    Letbox (Var Here) $
                    Shut $
-                   Letbox (MVar Here) (MVar Here)
+                   Letbox (MVar Here) -- {e=[Var Here]}
+                          (MVar Here) -- {e=[MVar (There $ There Here) {e=[Var Here]}]}
 
 discard : Term d g (Box [] a ~> a)
-discard = Lam $ Letbox (Var Here) (MVar Here)
+discard = Lam $ Letbox (Var Here) (MVar Here) -- {e=[]}
 
 wrap : Term d g (Box [b] a ~> Box [c] (Box [b] a))
-wrap = Lam $ Letbox (Var Here) (Shut $ Shut $ MVar Here)
+wrap = Lam $ Letbox (Var Here) (Shut $ Shut $ MVar Here) -- {e=[Var Here]}
 
 map1 : Term s g (Box [c] (a ~> b) ~> Box [d] a ~> Box [c,d] b)
 map1 = Lam $ Lam $ Letbox (Var $ There Here) $
                    Letbox (Var Here) $
-                   Shut $ App (MVar $ There Here) (MVar Here)
+                   Shut $ App (MVar (There Here)) -- {e=[Var Here]}
+                              (MVar Here)         -- {e=[Var $ There Here]}
 
 map2 : Term d g (Box [a] (a ~> b) ~> Box [b] c ~> Box [a] c)
 map2 = Lam $ Lam $ Letbox (Var $ There Here) $
                    Letbox (Var Here) $
-                   Shut (MVar Here)
+                   Shut (MVar Here) -- {e=[App (MVar (There Here) {e=[Var Here]}) (Var Here)]}
 
 reboxto : Term d g (Box [] (a ~> b) ~> Box [a] b)
 reboxto = Lam $ Letbox (Var Here) $
-                Shut $ App (MVar Here) (Var Here)
+                Shut $ App (MVar Here) -- {e=[]}
+                           (Var Here)
 
 reboxfro : Term d g (Box [a] b ~> Box [] (a ~> b))
 reboxfro = Lam $ Letbox (Var Here) $
-                 Shut $ Lam $ MVar Here
+                 Shut $ Lam $ MVar Here -- {e=[Var Here]}

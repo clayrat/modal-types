@@ -3,6 +3,8 @@ package modal-types
 sourcedir = src
 
 modules = Subset
+        , Data.NEList
+
         , Split
         , Dual.Ty
         , Dual.K
@@ -10,14 +12,21 @@ modules = Subset
         , Dual.T
         , Dual.S4
         , Dual.GL
-        , Moggi
+        , Dual.Contextual
+
         , Dual.S4dia
+        , Moggi
         , Moggi2S4dia
-        , Data.NEList
-        , Fitch.IsoFitchKripke
-        , Fitch.Ty
-        , Fitch.K
-        , Fitch.S4
+
+        , Kripke.IsoFitchKripke
+        , Kripke.Ty
+        , Kripke.K
+        , Kripke.T
+        , Kripke.K4
+        , Kripke.S4
+        , Kripke.Contextual.Ty
+        , Kripke.Contextual.K
+
         , Linear.DILL
         , Linear.DILLten
         , Linear.LNL

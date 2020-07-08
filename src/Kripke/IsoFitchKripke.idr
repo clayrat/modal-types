@@ -1,4 +1,4 @@
-module Fitch.IsoFitchKripke
+module Kripke.IsoFitchKripke
 
 import Control.Isomorphism
 import Data.NEList

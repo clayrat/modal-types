@@ -1,8 +1,8 @@
-module Fitch.K
+module Kripke.K
 
 import Subset
 import Data.List
-import Fitch.Ty
+import Kripke.Ty
 
 %default total
 %access public export

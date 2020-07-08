@@ -1,4 +1,4 @@
-module Fitch.Ty
+module Kripke.Ty
 
 %default total
 %access public export
