@@ -11,7 +11,8 @@ data Pref : a -> List a -> a -> List a -> Type where
   HereP  : Pref x xs    x  xs
   ShiftP : Pref x xs y (x::xs)
 
-prefSub : Subset g d -> Pairwise Subset ph ps -> Pref x xs g ph -> (y ** ys ** (Subset x y, Pairwise Subset xs ys, Pref y ys d ps))
+prefSub :             Subset g d -> Pairwise Subset ph ps -> Pref x xs g ph
+      -> (y ** ys ** (Subset x y,   Pairwise Subset xs ys,   Pref y ys d ps))
 prefSub {d}       {ps}       s     ss  HereP  = (d ** ps ** (s, ss, HereP))
 prefSub {ph=_::_} {ps=[]}    _     ss  ShiftP = absurd ss
 prefSub {ph=_::_} {ps=q::ps} _ (s1,ss) ShiftP = (q ** ps ** (s1, ss, ShiftP))
