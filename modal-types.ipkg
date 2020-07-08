@@ -24,6 +24,7 @@ modules = Subset
         , Kripke.T
         , Kripke.K4
         , Kripke.S4
+        , Kripke.GL
         , Kripke.Contextual.Ty
         , Kripke.Contextual.K
 
