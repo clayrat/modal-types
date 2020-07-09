@@ -33,5 +33,5 @@ comp = Lam $ Lam $
              (Open ShiftP (Var Here)) -- {e=[Var Here]}
              {e=[Open ShiftP (Var $ There Here)]} --{e=[Var Here]}
 
-discard : Term ph g (Box [] a ~> a)
-discard = Lam $ Open HereP (Var Here) -- {e=[]}
+eval : Term ph g (Box [] a ~> a)
+eval = Lam $ Open HereP (Var Here) -- {e=[]}
