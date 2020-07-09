@@ -12,7 +12,7 @@ data Term : List (List Ty) -> List Ty -> Ty -> Type where
   Lam  : Term ph (a::g) b -> Term ph g (a~>b)
   App  : Term ph g (a~>b) -> Term ph g a -> Term ph g b
   Shut : Term (g::ph) d a -> Term ph g (Box d a)
-  Open : Term ph p (Box d a) -> {auto e : All (Term (p::ph) g) d} -> Term (p::ph) g a
+  Open : Term ph g (Box s a) -> {auto e : All (Term (g::ph) d) s} -> Term (g::ph) d a
 
 weak : Term ph g (Box [b] a ~> Box [b,c] a)
 weak = Lam $ Shut $ Open (Var Here) -- {e=[Var Here]}
@@ -25,6 +25,15 @@ exch = Lam $ Shut $ Open (Var Here) -- {e=[Var $ There Here, Var Here]}
 
 triv : Term d g (Box [a] a)
 triv = Shut $ Var Here
+
+map1 : Term s g (Box [c] (a ~> b) ~> Box [d] a ~> Box [c,d] b)
+map1 = Lam $ Lam $ Shut $ App (Open $ Var $ There Here) -- {e=[Var Here]}
+                              (Open $ Var Here) -- {e=[Var Here]}
+
+map2 : Term ph g (Box [a] (a ~> b) ~> Box [b] c ~> Box [a] c)
+map2 = Lam $ Lam $ Shut $ Open (Var Here)
+                               {e=[App (Open (Var $ There Here)) -- {e=[Var Here]}
+                                       (Var Here)]}
 
 ex1 : Term ph g (Box [c] (a ~> b) ~> Box [c] a ~> Box [c] b)
 ex1 = Lam $ Lam $ Shut $ App (Open $ Var $ There Here) -- {e=[Var Here]}
