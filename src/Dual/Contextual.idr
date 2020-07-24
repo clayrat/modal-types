@@ -2,6 +2,8 @@ module Dual.Contextual
 
 import Data.List
 import Data.List.Quantifiers
+import All
+import Subset
 
 %default total
 %access public export
@@ -26,6 +28,17 @@ data Term : List BoxT -> List Ty -> Ty -> Type where
   App    : Term d g (a~>b) -> Term d g a -> Term d g b
   Shut   : Term d g a -> Term d s (Box g a)
   Letbox : Term d g (Box ps a) -> Term (MkBox ps a::d) g b -> Term d g b
+
+rename : Subset g s -> Term d g a -> Term d s a
+rename s (Var el)      = Var $ s el
+rename s (MVar el {e}) = MVar el {e=assert_total $ mapPointwise (rename s) e}
+rename s (Lam t)       = Lam $ rename (ext s) t
+rename s (App t u)     = App (rename s t) (rename s u)
+rename s (Shut t)      = Shut t
+rename s (Letbox t u)  = Letbox (rename s t) (rename s u)
+
+admit : Term (MkBox ps a::d) g c -> Term d (Box ps a::g) c
+admit t = Letbox (Var Here) (rename There t)
 
 weak : Term d g (Box [b] a ~> Box [b,c] a)
 weak = Lam $ Letbox (Var Here) (Shut $ MVar Here) -- {e=[Var Here]}
@@ -71,3 +84,7 @@ reboxto = Lam $ Letbox (Var Here) $
 reboxfro : Term d g (Box [a] b ~> Box [] (a ~> b))
 reboxfro = Lam $ Letbox (Var Here) $
                  Shut $ Lam $ MVar Here -- {e=[Var Here]}
+
+reboxto2 : Term d g (Box [] (a ~> b ~> c) ~> Box [a,b] c)
+reboxto2 = Lam $ Letbox (Var Here) $
+                 Shut $ App (App (MVar Here {e=[]}) (Var Here)) (Var $ There Here)
