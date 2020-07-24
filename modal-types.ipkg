@@ -11,6 +11,7 @@ modules = Subset
         , Dual.K4
         , Dual.T
         , Dual.S4
+        , Dual.SeqCalc.S4
         , Dual.GL
         , Dual.Contextual
 

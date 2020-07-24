@@ -1,4 +1,4 @@
-module Dual.K
+module Dual.T
 
 import Data.List
 import Dual.Ty
