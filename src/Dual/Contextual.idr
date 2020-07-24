@@ -37,6 +37,18 @@ rename s (App t u)     = App (rename s t) (rename s u)
 rename s (Shut t)      = Shut t
 rename s (Letbox t u)  = Letbox (rename s t) (rename s u)
 
+renameM : Subset d s -> Term d g a -> Term s g a
+renameM s (Var el)      = Var el
+renameM s (MVar el {e}) = MVar (s el) {e=assert_total $ mapPointwise (renameM s) e}
+renameM s (Lam t)       = Lam $ renameM s t
+renameM s (App t u)     = App (renameM s t) (renameM s u)
+renameM s (Shut t)      = Shut $ renameM s t
+renameM s (Letbox t u)  = Letbox (renameM s t) (renameM (ext s) u)
+
+idEntail : (g : List Ty) -> All (Term d g) g
+idEntail []     = []
+idEntail (a::g) = Var Here :: mapPointwise (rename There) (idEntail g)
+
 admit : Term (MkBox ps a::d) g c -> Term d (Box ps a::g) c
 admit t = Letbox (Var Here) (rename There t)
 
@@ -88,3 +100,35 @@ reboxfro = Lam $ Letbox (Var Here) $
 reboxto2 : Term d g (Box [] (a ~> b ~> c) ~> Box [a,b] c)
 reboxto2 = Lam $ Letbox (Var Here) $
                  Shut $ App (App (MVar Here {e=[]}) (Var Here)) (Var $ There Here)
+
+-- substitution
+
+Subst : List BoxT -> List Ty -> List Ty -> Type
+Subst d g s = {x : Ty} -> Elem x g -> Term d s x
+
+exts : Subst d g s -> Subst d (b::g) (b::s)
+exts _  Here      = Var Here
+exts s (There el) = rename There (s el)
+
+subst : Subst d g s -> Term d g a -> Term d s a
+subst s (Var el)      = s el
+subst s (MVar {e} el) = MVar el {e=assert_total $ mapPointwise (subst s) e}
+subst s (Lam t)       = Lam $ subst (exts s) t
+subst s (App t u)     = App (subst s t) (subst s u)
+subst s (Shut t)      = Shut t
+subst s (Letbox t u)  = Letbox (subst s t) (subst (renameM There . s) u)
+
+SubstM : List BoxT -> List BoxT -> Type
+SubstM d s = {x : Ty} -> {g : List Ty} -> Elem (MkBox g x) d -> Term s g x
+
+extsM : SubstM d s -> SubstM (b::d) (b::s)
+extsM _  Here      = MVar Here {e=idEntail _}
+extsM s (There el) = renameM There (s el)
+
+substM : SubstM d s -> Term d g a -> Term s g a
+substM s (Var el)      = Var el
+substM s (MVar {e} el) = subst (\el2 => assert_total $ substM s $ indexAll el2 e) (s el)
+substM s (Lam t)       = Lam $ substM s t
+substM s (App t u)     = App (substM s t) (substM s u)
+substM s (Shut t)      = Shut $ substM s t
+substM s (Letbox t u)  = Letbox (substM s t) (substM (extsM s) u)
