@@ -71,12 +71,15 @@ comp = Lam $ Lam $ Letbox (Var $ There Here) $
                    Letbox (MVar Here) -- {e=[Var Here]}
                           (MVar Here) -- {e=[MVar (There $ There Here) {e=[Var Here]}]}
 
+-- axiom T
 eval : Term d g (Box [] a ~> a)
 eval = Lam $ Letbox (Var Here) (MVar Here) -- {e=[]}
 
+-- axiom 4
 wrap : Term d g (Box [b] a ~> Box [c] (Box [b] a))
 wrap = Lam $ Letbox (Var Here) (Shut $ Shut $ MVar Here) -- {e=[Var Here]}
 
+-- variations on axiom K
 map1 : Term s g (Box [c] (a ~> b) ~> Box [d] a ~> Box [c,d] b)
 map1 = Lam $ Lam $ Letbox (Var $ There Here) $
                    Letbox (Var Here) $
