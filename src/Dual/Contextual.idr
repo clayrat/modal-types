@@ -31,7 +31,7 @@ data Term : List BoxT -> List Ty -> Ty -> Type where
 
 rename : Subset g s -> Term d g a -> Term d s a
 rename s (Var el)      = Var $ s el
-rename s (MVar el {e}) = MVar el {e=assert_total $ mapPointwise (rename s) e}
+rename s (MVar el {e}) = MVar el {e=assert_total $ mapPredicate (rename s) e}
 rename s (Lam t)       = Lam $ rename (ext s) t
 rename s (App t u)     = App (rename s t) (rename s u)
 rename s (Shut t)      = Shut t
@@ -39,7 +39,7 @@ rename s (Letbox t u)  = Letbox (rename s t) (rename s u)
 
 renameM : Subset d s -> Term d g a -> Term s g a
 renameM s (Var el)      = Var el
-renameM s (MVar el {e}) = MVar (s el) {e=assert_total $ mapPointwise (renameM s) e}
+renameM s (MVar el {e}) = MVar (s el) {e=assert_total $ mapPredicate (renameM s) e}
 renameM s (Lam t)       = Lam $ renameM s t
 renameM s (App t u)     = App (renameM s t) (renameM s u)
 renameM s (Shut t)      = Shut $ renameM s t
@@ -47,7 +47,7 @@ renameM s (Letbox t u)  = Letbox (renameM s t) (renameM (ext s) u)
 
 idEntail : (g : List Ty) -> All (Term d g) g
 idEntail []     = []
-idEntail (a::g) = Var Here :: mapPointwise (rename There) (idEntail g)
+idEntail (a::g) = Var Here :: mapPredicate (rename There) (idEntail g)
 
 admit : Term (MkBox ps a::d) g c -> Term d (Box ps a::g) c
 admit t = Letbox (Var Here) (rename There t)
@@ -112,7 +112,7 @@ exts s (There el) = rename There (s el)
 
 subst : Subst d g s -> Term d g a -> Term d s a
 subst s (Var el)      = s el
-subst s (MVar {e} el) = MVar el {e=assert_total $ mapPointwise (subst s) e}
+subst s (MVar {e} el) = MVar el {e=assert_total $ mapPredicate (subst s) e}
 subst s (Lam t)       = Lam $ subst (exts s) t
 subst s (App t u)     = App (subst s t) (subst s u)
 subst s (Shut t)      = Shut t
@@ -132,3 +132,36 @@ substM s (Lam t)       = Lam $ substM s t
 substM s (App t u)     = App (substM s t) (substM s u)
 substM s (Shut t)      = Shut $ substM s t
 substM s (Letbox t u)  = Letbox (substM s t) (substM (extsM s) u)
+
+subst1 : Term d (b::g) a -> Term d g b -> Term d g a
+subst1 {d} {g} {b} t u = subst {g=b::g} go t
+  where
+  go : Subst d (b::g) g
+  go  Here      = u
+  go (There el) = Var el
+
+subst1M : Term (MkBox s b::d) g a -> Term d s b -> Term d g a
+subst1M {d} {s} {b} t u = substM {d=MkBox s b::d} go t
+  where
+  go : SubstM (MkBox s b::d) d
+  go  Here      = u
+  go (There el) = MVar el {e=idEntail _}
+
+isVal : Term d g a -> Bool
+isVal (Lam _)  = True
+isVal (Var _)  = True
+--isVal (Shut _)  = True
+isVal  _       = False
+
+step : Term d g a -> Maybe (Term d g a)
+step (App    (Lam body) sub ) = Just $ subst1 body sub
+step (App     t         u   ) =
+  if isVal t
+    then Nothing
+    else [| App (step t) (pure u) |]
+step (Letbox (Shut sub) body) = Just $ subst1M body sub
+step (Letbox  t         u   ) =
+  if isVal t
+    then Nothing
+    else [| Letbox (step t) (pure u) |]
+step  _                       = Nothing
