@@ -1,11 +1,11 @@
-module Kripke.Ty
+module Ty.Contextual
 
 %default total
 %access public export
 
 data Ty = A
         | Imp Ty Ty
-        | Box Ty
+        | Box (List Ty) Ty
 
 infixr 5 ~>
 (~>) : Ty -> Ty -> Ty

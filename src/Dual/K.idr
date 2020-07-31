@@ -1,7 +1,7 @@
 module Dual.K
 
 import Data.List
-import Dual.Ty
+import Ty
 import Subset
 
 %default total
@@ -54,23 +54,12 @@ exts : Subst d g s -> Subst d (b::g) (b::s)
 exts _  Here      = Var Here
 exts s (There el) = rename There (s el)
 
---extsM : Subst d g s -> Subst (b::d) (b::g) s
---extsM _  Here      = ?wat --Var Here
---extsM s (There el) = renameM There (s el)
-
 subst : Subst d g s -> Term d g a -> Term d s a
 subst s (Var el)     = s el
 subst s (Lam t)      = Lam $ subst (exts s) t
 subst s (App t u)    = App (subst s t) (subst s u)
 subst s (Shut t)     = Shut t
 subst s (Letbox t u) = Letbox (subst s t) (subst (renameM There . s) u)
-
---substM : Subst s d [] -> Term d g a -> Term s g a
---substM s (Var el)     = Var el
---substM s (Lam t)      = Lam $ substM s t
---substM s (App t u)    = App (substM s t) (substM s u)
---substM s (Shut t)     = Shut $ subst ?wat t
---substM s (Letbox t u) = Letbox (substM s t) (substM (extsM s) u)
 
 subst1 : Term d (b::g) a -> Term d g b -> Term d g a
 subst1 {d} {g} {b} t s = subst {g=b::g} go t
@@ -79,27 +68,51 @@ subst1 {d} {g} {b} t s = subst {g=b::g} go t
   go  Here      = s
   go (There el) = Var el
 
---subst1M : Term (b::d) g a -> Term d [] b -> Term d g a
---subst1M {d} {g} {b} t s = substM {d=b::d} go t
---  where
---  go : Subst d (b::d) []
---  go  Here      = s
---  go (There el) = MVar el
+SubstM : List Ty -> List Ty -> List Ty -> Type
+SubstM d s g = {x : Ty} -> Elem x d -> Term s g x
 
--- isVal : Term d g a -> Bool
--- isVal (Lam _)  = True
--- isVal (Var _)  = True
--- isVal  _       = False
+--extsM : SubstM d s g -> SubstM (b::d) (b::s) g
+--extsM _  Here      = ?wat
+--extsM s (There el) = renameM There (s el)
 --
--- step : Term d g a -> Maybe (Term d g a)
--- step (App    (Lam body) sub ) = Just $ subst1 body sub
--- step (App     t         u   ) =
---   if isVal t
---     then Nothing
---     else [| App (step t) (pure u) |]
--- step (Letbox (Shut sub) body) = Just $ subst1M body sub
--- step (Letbox  t         u   ) =
---   if isVal t
---     then Nothing
---     else [| Letbox (step t) (pure u) |]
--- step  _                       = Nothing
+--shiftM : SubstM d s [] -> SubstM s [] d
+--shiftM s  Here      = ?wat1
+--shiftM s (There el) = ?wat2
+
+--substM : SubstM d s [] -> Term d g a -> Term s g a
+--substM s (Var el)     = Var el
+--substM s (Lam t)      = Lam $ substM s t
+--substM s (App t u)    = App (substM s t) (substM s u)
+--substM s (Shut t)     = Shut $ subst (shiftM s) t
+--substM s (Letbox t u) = Letbox (substM s t) (substM (extsM s) u)
+
+subst1M : Term (b::d) g a -> Term [] d b -> Term d g a
+subst1M (Var el)     v = Var el
+subst1M (Lam t)      v = Lam $ subst1M t v
+subst1M (App t u)    v = App (subst1M t v) (subst1M u v)
+subst1M (Shut t)     v = Shut $ subst1M ?wat ?wat2
+subst1M (Letbox t u) v = ?wat5
+
+--subst1M {d} {g} {b} t u = substM go t
+--  where
+--  go : SubstM (b::d) d []
+--  go  Here      = ?wat --s
+--  go (There el) = ?wat1 --MVar el
+
+isVal : Term d g a -> Bool
+isVal (Lam _)  = True
+isVal (Var _)  = True
+isVal  _       = False
+
+step : Term d g a -> Maybe (Term d g a)
+step (App    (Lam body) sub ) = Just $ subst1 body sub
+step (App     t         u   ) =
+  if isVal t
+    then Nothing
+    else [| App (step t) (pure u) |]
+step (Letbox (Shut sub) body) = Just $ ?wat0 --subst1M body sub
+step (Letbox  t         u   ) =
+  if isVal t
+    then Nothing
+    else [| Letbox (step t) (pure u) |]
+step  _                       = Nothing

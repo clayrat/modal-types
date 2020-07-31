@@ -2,7 +2,7 @@ module Kripke.Contextual.K
 
 import Data.List
 import Data.List.Quantifiers
-import Kripke.Contextual.Ty
+import Ty.Contextual
 
 %default total
 %access public export

@@ -1,7 +1,7 @@
 module Dual.K4
 
 import Data.List
-import Dual.Ty
+import Ty
 import Subset
 
 %default total

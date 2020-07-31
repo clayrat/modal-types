@@ -1,7 +1,7 @@
 module Dual.SeqCalc.S4
 
 import Data.List
-import Dual.Ty
+import Ty
 import Subset
 
 %default total

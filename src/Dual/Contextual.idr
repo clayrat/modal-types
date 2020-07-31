@@ -4,17 +4,10 @@ import Data.List
 import Data.List.Quantifiers
 import All
 import Subset
+import Ty.Contextual
 
 %default total
 %access public export
-
-data Ty = A
-        | Imp Ty Ty
-        | Box (List Ty) Ty
-
-infixr 5 ~>
-(~>) : Ty -> Ty -> Ty
-(~>) = Imp
 
 record BoxT where
   constructor MkBox

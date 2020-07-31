@@ -5,8 +5,10 @@ sourcedir = src
 modules = Subset
         , Data.NEList
 
+        , Ty
+        , Ty.Contextual
         , Split
-        , Dual.Ty
+
         , Dual.K
         , Dual.K4
         , Dual.T
@@ -20,7 +22,6 @@ modules = Subset
         , Moggi2S4dia
 
         , Kripke.IsoFitchKripke
-        , Kripke.Ty
         , Kripke.K
         , Kripke.T
         , Kripke.K4
@@ -28,6 +29,8 @@ modules = Subset
         , Kripke.GL
         , Kripke.Contextual.Ty
         , Kripke.Contextual.K
+        , Kripke.Contextual.K4
+        , Kripke.Contextual.T
 
         , Linear.DILL
         , Linear.DILLten

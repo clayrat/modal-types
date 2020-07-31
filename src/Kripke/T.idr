@@ -2,7 +2,7 @@ module Kripke.T
 
 import Subset
 import Data.List
-import Kripke.Ty
+import Ty
 
 %default total
 %access public export
