@@ -1,4 +1,4 @@
-module Fitch.Dia.Ty
+module Ty.Dia
 
 %default total
 %access public export

@@ -2,18 +2,10 @@ module Dual.S4dia
 
 import Data.List
 import Subset
+import Ty.Dia
 
 %default total
 %access public export
-
-data Ty = A
-        | Imp Ty Ty
-        | Box Ty
-        | Dia Ty
-
-infixr 5 ~>
-(~>) : Ty -> Ty -> Ty
-(~>) = Imp
 
 mutual
   data Term : List Ty -> List Ty -> Ty -> Type where
