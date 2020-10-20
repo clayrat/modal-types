@@ -42,4 +42,4 @@ rename {ps=_::_} s (q, ss) (Pure t)     = Pure $ rename q ss t
 rename           s     ss  (Letdia t u) = Letdia (rename s ss t) u
 
 mono : Term [] [] (a~>b) -> Term ph g (Dia a ~> Dia b)
-mono f = Lam $ Letdia (Var Here) (Pure $ App (rename absurd () f) (Var Here))
+mono f = Lam $ Letdia (Var Here) (Pure $ App (rename nilSubset () f) (Var Here))
