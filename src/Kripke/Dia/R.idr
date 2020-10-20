@@ -54,9 +54,9 @@ rename         s ss (Lam t)           = Lam $ rename (ext s) ss t
 rename         s ss (App t u)         = App (rename s ss t) (rename s ss u)
 rename {g} {d} s ss (Shut t)          = Shut $ rename id (MkPair {A=Subset g d} s ss) t
 rename         s ss (Open pr t)       =
-  let (aa**bb**(s2,ss2,pr2)) = prefSub s ss pr in
+  let (_**_**(s2,ss2,pr2)) = prefSub s ss pr in
   Open pr2 (assert_total $ rename s2 ss2 t) -- totality checker chokes
 rename         s ss (Pure pr t)       =
-  let (aa**bb**(s2,ss2,pr2)) = prefSub s ss pr in
+  let (_**_**(s2,ss2,pr2)) = prefSub s ss pr in
   Pure pr2 (assert_total $ rename s2 ss2 t)
 rename         s ss (Letdia t u)      = Letdia (rename s ss t) u
