@@ -20,11 +20,15 @@ axiomK : Term ph g (Box (a ~> b) ~> Box a ~> Box b)
 axiomK = Lam $ Lam $ Shut $ App (Open $ Var $ There Here)
                                 (Open $ Var Here)
 
+-- dia -| box
+
 wrap : Term ph g (a ~> Box (Dia a))
 wrap = Lam $ Shut $ Pure $ Var Here
 
 unwrap : Term ph g (Dia (Box a) ~> a)
 unwrap = Lam $ Letdia (Var Here) (Open $ Var Here)
+
+-- structural rule
 
 rename : Subset g d -> Pairwise Subset ph ps -> Term ph g a -> Term ps d a
 rename           s     _   (Var el)     = Var $ s el
