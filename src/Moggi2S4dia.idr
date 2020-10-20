@@ -3,6 +3,7 @@ module Moggi2S4dia
 import Data.List
 import Moggi as MG
 import Dual.S4dia as S4
+import Ty.Dia
 import Subset
 
 %default total
@@ -13,7 +14,7 @@ import Subset
 -- In the monadic metalanguage, all values are stable, so a function `a~>b` accepts a stable value of type `a` and returns a value of type `b`
 -- `M a` is a computation which returns a stable value of type `a`
 
-embedTy : MG.Ty -> S4.Ty
+embedTy : MG.Ty -> Dia.Ty
 embedTy  A        = A
 embedTy (Imp a b) = Imp (Box (embedTy a)) (embedTy b)
 embedTy (M a)     = Dia $ Box $ embedTy a

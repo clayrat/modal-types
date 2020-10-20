@@ -26,20 +26,26 @@ mutual
     Letval : Term g (M a) -> PTerm (a::g) b -> PTerm g b
 
 map : Term g ((a ~> b) ~> M a ~> M b)
-map = Lam $ Lam $ Val $ Letval (Var Here)
-                               (Wrap $ App (Var $ There $ There Here)
-                                           (Var Here))
+map = Lam $ Lam $ Val $ Letval (Var Here) $
+                        Wrap $ App (Var $ There $ There Here)
+                                   (Var Here)
 
 pure : Term g (a ~> M a)
 pure = Lam $ Val $ Wrap $ Var Here
 
+ap : Term g (M (a ~> b) ~> M a ~> M b)
+ap = Lam $ Lam $ Val $ Letval (Var Here) $
+                       Letval (Var $ There $ There Here) $
+                       Wrap $ App (Var Here)
+                                  (Var $ There Here)
+
 flatten : Term g (M (M a) ~> M a)
-flatten = Lam $ Val $ Letval (Var Here)
-                             (Letval (Var Here)
-                                     (Wrap $ Var Here))
+flatten = Lam $ Val $ Letval (Var Here) $
+                      Letval (Var Here) $
+                      Wrap $ Var Here
 
 flatMap : Term g ((a ~> M b) ~> M a ~> M b)
-flatMap = Lam $ Lam $ Val $ Letval (Var Here)
-                                   (Letval (App (Var $ There $ There Here)
-                                                (Var Here))
-                                           (Wrap $ Var Here))
+flatMap = Lam $ Lam $ Val $ Letval (Var Here) $
+                            Letval (App (Var $ There $ There Here)
+                                        (Var Here)) $
+                            Wrap $ Var Here

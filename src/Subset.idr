@@ -5,10 +5,10 @@ import Data.List.Quantifiers
 %hide Prelude.Pairs.Subset
 %default total
 
---export
---elemMap : (f : a -> b) -> Elem x xs -> Elem (f x) (map f xs)
---elemMap f  Here      = Here
---elemMap f (There el) = There $ elemMap f el
+export
+elemMap : (f : a -> b) -> Elem x xs -> Elem (f x) (map f xs)
+elemMap f  Here      = Here
+elemMap f (There el) = There $ elemMap f el
 
 public export
 Subset : (g : List a) -> (d : List a) -> Type
