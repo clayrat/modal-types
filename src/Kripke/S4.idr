@@ -25,6 +25,7 @@ data Term : List (List Ty) -> List Ty -> Ty -> Type where
   App  : Term ph g (a~>b) -> Term ph g a -> Term ph g b
   Shut : Term (g::ph) [] a -> Term ph g (Box a)             -- ~quasiquote
   Open : Pref g ph d ps -> Term ph g (Box a) -> Term ps d a -- ~unquoteN
+                                                            -- potentially we should have g' in Pref, which itself can also be a prefix ++ g
 
 axiomK : Term ph g (Box (a ~> b) ~> Box a ~> Box b)
 axiomK = Lam $ Lam $ Shut $ App (Open (ThereP HereP) (Var $ There Here))

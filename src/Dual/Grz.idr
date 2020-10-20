@@ -22,6 +22,9 @@ axiomK = Lam $ Lam $ Letbox (Var $ There Here) $
 axiom4 : Term d g (Box a ~> Box (Box a))
 axiom4 = Lam $ Letbox (Var Here) (ShutFx $ ShutFx $ MVar Here)
 
+axiomT : Term d g (Box a ~> a)
+axiomT = Lam $ Letbox (Var Here) (MVar Here)
+
 axiomGrz : Term d g (Box (Box (a ~> Box a) ~> a) ~> a)
 axiomGrz = Lam $ Letbox (Var Here) $
                  App (MVar Here)
